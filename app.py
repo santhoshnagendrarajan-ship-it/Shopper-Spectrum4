@@ -2,17 +2,21 @@ import streamlit as st
 import pandas as pd
 import joblib
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 
 # Load models and data
 kmeans = joblib.load('kmeans_rfm_model.pkl')
 scaler = joblib.load('rfm_scaler.pkl')
-data = pd.read_csv('online_retail.csv')
+# Load only the Description column to avoid building a large dense pivot table
+data = pd.read_csv('online_retail.csv', usecols=['Description'])
 
-# Prepare product-customer matrix for recommendations
-pivot = data.pivot_table(index='CustomerID', columns='Description', values='Quantity', aggfunc='sum', fill_value=0)
-product_names = list(pivot.columns)
-product_similarity = cosine_similarity(pivot.T)
+# Derive product names from unique descriptions (memory-efficient)
+product_names = data['Description'].dropna().unique().tolist()
+vectorizer = TfidfVectorizer(stop_words='english')
+tfidf_matrix = vectorizer.fit_transform(product_names)
+
+product_similarity = cosine_similarity(tfidf_matrix,tfidf_matrix)
 
 def recommend_products(product_name, top_n=5):
     if product_name not in product_names:
