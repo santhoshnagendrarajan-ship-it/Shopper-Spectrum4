@@ -64,8 +64,8 @@ elif page == "Recommendation":
 elif page == "Clustering":
     st.title("🔍 Customer Segmentation")
     st.markdown("Input RFM values to predict the customer segment.")
-    recency = st.number_input("Recency (days)", min_value=0, value=30)
-    frequency = st.number_input("Frequency (number of purchases)", min_value=0, value=5)
+    recency = st.number_input("Recency (Days since last purchase)", min_value=0, value=30)
+    frequency = st.number_input("Frequency (Number of transactions per customer)", min_value=0, value=5)
     monetary = st.number_input("Monetary (total spend)", min_value=0.0, value=100.0)
     if st.button("Predict Cluster"):
         segment = predict_cluster(recency, frequency, monetary)
